@@ -34,6 +34,7 @@ use super::codex_instance_routing::{
     launch_mode_uses_desktop_runtime, model_routing_update_error,
     validate_instance_model_routing,
 };
+use super::codex_instance_start_runtime::{stop_runtime_for_start, StartRuntimeState};
 
 pub(crate) const DEFAULT_INSTANCE_ID: &str = "__default__";
 const CODEX_INSTANCE_LAUNCH_PROGRESS_EVENT: &str = "codex:instance-launch-progress";
@@ -1062,6 +1063,7 @@ mod tests {
             model_id: "gpt-5".to_string(),
             display_name: "GPT-5".to_string(),
             reasoning_efforts: None,
+            default_reasoning_effort: None,
             context_window: None,
             auto_compact_token_limit: None,
         }]
@@ -2137,11 +2139,24 @@ pub async fn codex_preview_session_import(
 }
 
 #[tauri::command]
+pub async fn codex_validate_session_import_paths(
+    cwd_mappings: std::collections::HashMap<String, String>,
+) -> Result<std::collections::HashMap<String, String>, String> {
+    tokio::time::timeout(std::time::Duration::from_secs(5),
+        tauri::async_runtime::spawn_blocking(move || {
+            modules::codex_session_import_paths::validate_target_paths(&cwd_mappings)
+        }),
+    ).await.map_err(|_| "验证项目目录超时，请重试".to_string())?
+        .map_err(|error| format!("验证项目目录失败: {}", error))
+}
+
+#[tauri::command]
 pub async fn codex_import_sessions(
     app: AppHandle,
     import_file_path: String,
     target_instance_id: Option<String>,
     session_ids: Vec<String>,
+    cwd_mappings: Option<std::collections::HashMap<String, String>>,
     transfer_id: Option<String>,
 ) -> Result<modules::codex_session_manager::CodexSessionImportSummary, String> {
     tauri::async_runtime::spawn_blocking(move || {
@@ -2157,6 +2172,7 @@ pub async fn codex_import_sessions(
             import_file_path,
             target_instance_id,
             session_ids,
+            cwd_mappings.unwrap_or_default(),
             transfer_id,
             Some(&reporter),
         )
@@ -2211,27 +2227,27 @@ pub async fn codex_create_instance(
     launch_mode: Option<InstanceLaunchMode>,
     app_speed: Option<CodexAppSpeed>,
 ) -> Result<CodexInstanceProfileView, String> {
-    let effective_launch_mode = launch_mode.clone().unwrap_or_default();
-    // 归一化结果必须落库：绑定账号不支持混合路由时按“已关闭”保存，
-    // 否则后台监控会按启用状态反复尝试恢复一个注定失败的网关。
-    let model_routing = validate_instance_model_routing(
-        bind_account_id.as_deref(),
-        &effective_launch_mode,
-        model_routing.as_ref(),
-    )?;
-    let instance =
-        modules::codex_instance::create_instance(modules::codex_instance::CreateInstanceParams {
-            name,
-            user_data_dir,
-            working_dir,
-            extra_args: extra_args.unwrap_or_default(),
-            bind_account_id,
-            model_routing,
-            copy_source_instance_id,
-            init_mode,
-            launch_mode,
-            app_speed,
-        })?;
+    let params = modules::codex_instance::CreateInstanceParams {
+        name, user_data_dir, working_dir, extra_args: extra_args.unwrap_or_default(),
+        bind_account_id, model_routing, copy_source_instance_id, init_mode, launch_mode, app_speed,
+    };
+    let cancelled = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let worker_cancelled = cancelled.clone();
+    let worker = tauri::async_runtime::spawn_blocking(move || {
+        let mut params = params;
+        let effective_launch_mode = params.launch_mode.clone().unwrap_or_default();
+        params.model_routing = validate_instance_model_routing(
+            params.bind_account_id.as_deref(), &effective_launch_mode, params.model_routing.as_ref(),
+        )?;
+        modules::codex_instance::create_instance_with_cancellation(params, &worker_cancelled)
+    });
+    let instance = match tokio::time::timeout(std::time::Duration::from_secs(120), worker).await {
+        Ok(result) => result.map_err(|error| format!("创建实例任务失败: {error}"))??,
+        Err(_) => {
+            cancelled.store(true, std::sync::atomic::Ordering::Release);
+            return Err("创建实例超时，请检查来源目录和磁盘后重试".to_string());
+        }
+    };
 
     created_instance_view_after_binding(
         instance,
@@ -2543,6 +2559,7 @@ async fn codex_start_instance_internal(
     emit_launch_progress: bool,
     launch_operation: Option<&str>,
     expected_prepared_binding: Option<&str>,
+    runtime_state: StartRuntimeState,
 ) -> Result<CodexInstanceProfileView, String> {
     let _start_guard = CodexInstanceStartGuard::acquire(&instance_id)?;
     clear_codex_instance_start_cancel(&instance_id);
@@ -2760,7 +2777,8 @@ async fn codex_start_instance_internal(
             expected_prepared_binding, default_bind_account_id.as_deref(),
         )?;
         if default_settings.launch_mode != InstanceLaunchMode::Cli {
-            modules::process::ensure_codex_launch_path_configured()?;
+            tauri::async_runtime::spawn_blocking(modules::process::ensure_codex_launch_path_configured)
+                .await.map_err(|error| error.to_string())??;
         }
         modules::logger::log_info(&format!(
             "[Codex Start] default prepare phase finished: bind_account_id={:?}, launch_mode={:?}, elapsed_ms={}, total_ms={}",
@@ -2772,19 +2790,8 @@ async fn codex_start_instance_internal(
         let close_started = Instant::now();
         modules::codex_app_injection::stop_for_profile(&default_dir);
         let close_mode = if launch_mode_uses_desktop_runtime(&default_settings.launch_mode) {
-            let fast_closed = if skip_default_bind_account_injection {
-                modules::process::close_codex_default_fast_by_pid(default_settings.last_pid, 20)?
-            } else {
-                false
-            };
-            if !fast_closed {
-                modules::process::close_codex_default(20)?;
-            }
-            if fast_closed {
-                "fast-pid"
-            } else {
-                "full-probe"
-            }
+            stop_runtime_for_start(runtime_state, || modules::process::close_codex_default(20))
+                .await?
         } else {
             modules::logger::log_info("[Codex Start] CLI 模式无需关闭桌面运行态，继续准备实例配置");
             "cli-no-desktop"
@@ -3030,17 +3037,24 @@ async fn codex_start_instance_internal(
         );
         let launch_started = Instant::now();
         ensure_codex_instance_start_not_cancelled(&instance_id)?;
-        let pid = if skip_default_bind_account_injection {
-            modules::process::start_codex_default_fast_after_close_with_egress(
-                &injection_plan.args,
-                egress_proxy_url.as_deref(),
-            )?
-        } else {
-            modules::process::start_codex_default_with_egress(
-                &injection_plan.args,
-                egress_proxy_url.as_deref(),
-            )?
-        };
+        let launch_args = injection_plan.args.clone();
+        // Package registration, activation and PID confirmation can wait on
+        // Windows services. Keep that synchronous work off the async runtime.
+        let pid = tauri::async_runtime::spawn_blocking(move || {
+            if skip_default_bind_account_injection {
+                modules::process::start_codex_default_fast_after_close_with_egress(
+                    &launch_args,
+                    egress_proxy_url.as_deref(),
+                )
+            } else {
+                modules::process::start_codex_default_with_egress(
+                    &launch_args,
+                    egress_proxy_url.as_deref(),
+                )
+            }
+        })
+        .await
+        .map_err(|error| format!("Codex launch worker failed: {error}"))??;
         if codex_instance_start_cancelled(&instance_id) {
             let _ = modules::process::close_pid(pid, 5);
             return Err("CODEX_START_CANCELLED".to_string());
@@ -3115,13 +3129,11 @@ async fn codex_start_instance_internal(
 
     let close_started = Instant::now();
     modules::codex_app_injection::stop_for_profile(instance_dir);
-    if modules::process::resolve_codex_pid(instance.last_pid, Some(&instance.user_data_dir)).is_some() {
-        let target_home = instance.user_data_dir.clone();
-        tauri::async_runtime::spawn_blocking(move || {
-            modules::process::close_codex_instances(&[target_home], 20)
-        }).await.map_err(|error| error.to_string())??;
-        let _ = modules::codex_instance::update_instance_pid(&instance.id, None)?;
-    }
+    let target_home = instance.user_data_dir.clone();
+    stop_runtime_for_start(runtime_state, move || {
+        modules::process::close_codex_instances(&[target_home], 20)
+    }).await?;
+    let _ = modules::codex_instance::update_instance_pid(&instance.id, None)?;
     modules::codex_local_access::stop_provider_gateways_for_profile(instance_dir).await;
     restore_mixed_model_gateway_when_disabled(instance_dir, instance.model_routing.as_ref())
         .await?;
@@ -3325,7 +3337,8 @@ async fn codex_start_instance_internal(
         ));
     }
 
-    modules::process::ensure_codex_launch_path_configured()?;
+    tauri::async_runtime::spawn_blocking(modules::process::ensure_codex_launch_path_configured)
+        .await.map_err(|error| error.to_string())??;
     let extra_args = modules::process::parse_extra_args(&instance.extra_args);
     let cdp_enabled =
         modules::codex_app_injection::should_enable_cdp(instance.bind_account_id.as_deref());
@@ -3417,6 +3430,7 @@ async fn codex_start_instance_internal(
 /// 本方法调用 `codex_start_instance_internal` 复用多开实例的启动事务；调用方必须在整个
 /// “凭据写入 + 默认实例启动”期间持有默认 profile 写入租约。`launch_operation` 仅用于标识
 /// 启动来源并关联前端进度状态，不改变 Token Authority 和 profile 落盘规则。
+/// 调用前必须成功停止目标运行态；启动事务复用该结果，不再重复关闭。
 pub(crate) async fn codex_start_default_with_prepared_profile(
     app: AppHandle,
     emit_launch_progress: bool,
@@ -3435,6 +3449,7 @@ pub(crate) async fn codex_start_default_with_prepared_profile(
         emit_launch_progress,
         launch_operation,
         expected_prepared_binding,
+        StartRuntimeState::Stopped,
     )
     .await;
     let result = match result {
@@ -3487,6 +3502,7 @@ pub(crate) async fn codex_start_default_with_prepared_profile(
 
 /// 启动已经由 API Service 激活流程准备好 profile 的非默认实例。
 /// 调用方必须在整个“凭据写入 + 实例启动”期间持有目标 profile 写入租约。
+/// 调用前必须成功停止目标运行态。
 pub(crate) async fn codex_start_instance_with_prepared_profile(
     app: AppHandle,
     instance_id: String,
@@ -3504,6 +3520,7 @@ pub(crate) async fn codex_start_instance_with_prepared_profile(
         emit_launch_progress,
         launch_operation,
         launch_target.bind_account_id.as_deref(),
+        StartRuntimeState::Stopped,
     )
     .await;
     let result = match result {
@@ -3575,6 +3592,7 @@ pub async fn codex_start_instance(
         true,
         None,
         None,
+        StartRuntimeState::NeedsStop,
     )
     .await;
     if let Err(error) = &result {

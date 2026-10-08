@@ -4,6 +4,14 @@ mod models;
 mod modules;
 mod utils;
 
+#[cfg(test)]
+mod dependency_tls_tests;
+
+#[cfg(target_os = "windows")]
+pub fn try_run_codex_package_launcher() -> Option<i32> {
+    modules::process::codex_package_launcher::try_run()
+}
+
 use modules::config::CloseWindowBehavior;
 use modules::logger;
 use std::sync::OnceLock;
@@ -404,6 +412,9 @@ pub fn run() {
 
             // 一次性迁移：历史版本可能被自动开启的「模型管理」统一关闭，之后由用户自己决定。
             std::thread::spawn(|| {
+                // Recover interrupted explicit imports before other model maintenance
+                // can touch the same profiles. None of this gates the main window.
+                modules::codex_account::recover_pending_model_config_imports_for_known_profiles();
                 let migrated =
                     modules::codex_account::migrate_model_management_default_off_for_all_profiles();
                 if migrated > 0 {
@@ -412,11 +423,7 @@ pub fn run() {
                         migrated
                     ));
                 }
-            });
-
-            // 受管模型目录版本校验：升级后旧目录（没有版本戳或版本落后）在后台按当前
-            // 生成逻辑重建一次，避免用户不切号就一直在用旧的能力声明。
-            std::thread::spawn(|| {
+                // 受管模型目录版本校验在恢复和迁移后继续执行。
                 let rebuilt = modules::codex_account::rebuild_stale_managed_model_catalogs();
                 if rebuilt > 0 {
                     logger::log_info(&format!(
@@ -943,6 +950,8 @@ pub fn run() {
             commands::system::hide_floating_card_window,
             commands::system::hide_current_floating_card_window,
             commands::system::set_floating_card_always_on_top,
+            commands::system::update_floating_card_appearance,
+            commands::system::resize_current_floating_card_window,
             commands::system::set_current_floating_card_window_always_on_top,
             commands::system::set_floating_card_confirm_on_close,
             commands::system::save_floating_card_position,
@@ -1013,6 +1022,7 @@ pub fn run() {
             commands::codex::list_codex_accounts,
             commands::codex::get_current_codex_account,
             commands::codex::get_codex_config_toml_path,
+            commands::codex::get_codex_storage_paths,
             commands::codex::open_codex_config_toml,
             commands::codex::get_codex_quick_config,
             commands::codex::save_codex_context_management,
@@ -1046,7 +1056,7 @@ pub fn run() {
             commands::codex::import_codex_from_local,
             commands::codex::start_codex_temp_login,
             commands::codex::cancel_codex_temp_login,
-            commands::codex::open_codex_temp_login_auth_url,
+            commands::codex::retry_codex_temp_login_import,
             commands::codex::cleanup_codex_temp_login_artifacts,
             commands::codex::import_codex_from_json,
             commands::codex::export_codex_accounts,
@@ -1143,8 +1153,17 @@ pub fn run() {
             commands::codex::codex_model_provider_chat_test_batch,
             commands::codex::codex_cancel_model_provider_chat_test,
             commands::codex::codex_list_model_provider_models,
+            commands::codex::get_codex_model_reasoning_efforts,
+            commands::codex::preview_codex_model_config_import,
+            commands::codex::import_codex_model_config,
+            commands::codex::export_codex_model_config,
             commands::codex::codex_query_model_provider_usage,
             commands::codex::codex_local_access_get_state,
+            commands::codex::codex_local_access_get_request_detail,
+            commands::codex::codex_local_access_get_request_payload_logging,
+            commands::codex::codex_local_access_get_request_payload_logging_status,
+            commands::codex::codex_local_access_update_request_payload_logging,
+            commands::codex::codex_local_access_clear_request_payloads,
             commands::codex::codex_list_instance_gateways,
             commands::codex::codex_stop_instance_gateway,
             commands::codex::codex_restart_instance_gateway,
@@ -1152,6 +1171,7 @@ pub fn run() {
             commands::codex::codex_local_access_append_accounts,
             commands::codex::codex_local_access_remove_account,
             commands::codex::codex_local_access_recover_accounts,
+            commands::codex::codex_local_access_clear_pool_failure,
             commands::codex::codex_local_access_rotate_api_key,
             commands::codex::codex_local_access_update_bound_oauth_account,
             commands::codex::codex_local_access_clear_stats,
@@ -1176,6 +1196,7 @@ pub fn run() {
             commands::codex::codex_local_access_update_gateway_mode,
             commands::codex::codex_local_access_update_debug_logs,
             commands::codex::codex_local_access_update_image_generation_model,
+            commands::codex::codex_local_access_update_image_generation_main_model,
             commands::codex::codex_local_access_update_image_generation_accounts,
             commands::codex::codex_local_access_update_access_scope,
             commands::codex::codex_local_access_update_client_base_url_host,
@@ -1564,6 +1585,7 @@ pub fn run() {
             commands::codex_instance::codex_preview_session_export,
             commands::codex_instance::codex_export_sessions,
             commands::codex_instance::codex_preview_session_import,
+            commands::codex_instance::codex_validate_session_import_paths,
             commands::codex_instance::codex_import_sessions,
             commands::codex_instance::codex_open_session_location,
             commands::codex_instance::codex_open_session_rollout,
