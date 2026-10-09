@@ -98,6 +98,7 @@ Antigravity IDE 인스턴스를 여러 개 실행하고 서로 다른 계정을 
 - **쿼터 표시**: Hourly 및 Weekly 쿼터 상태를 명확하게 표시
 - **플랜 식별**: 계정 플랜 유형(Basic, Plus, Team 등)을 자동으로 인식
 - **API 서비스**: 로컬 Codex API 서비스는 내장된 CLIProxyAPI 사이드카가 구동합니다. Cockpit Tools는 계정 동기화, 설정 투영, 상태 및 사용량 통계를 담당하며, Base URL과 API Key, 사용자 조작 방식은 그대로 유지됩니다.
+- **음성 프록싱**: 네이티브 Codex 백엔드 실시간 라우트와 `/transcribe`를 지원하며, `/v1/audio/transcriptions`, `/v1/audio/translations`, `/v1/audio/speech` 및 `/v1` 없는 별칭도 지원합니다. OAuth 트랜스크리브는 ChatGPT 백엔드를 사용합니다. 호환 엔드포인트는 `file`, `language`, JSON/텍스트 출력을 지원하며, `model`은 호환성용 필드이고 실제 모델은 백엔드가 선택합니다. 타임스탬프 자막, 스트리밍 트랜스크리브 등 그 밖의 오디오 작업에는 해당 API를 지원하는 API Key 제공자가 필요합니다. 네이티브 `/transcribe`는 멀티파트 필드를 그대로 유지하며, API Key 전달 방식은 요청에 모델이 없으면 `gpt-4o-mini-transcribe`를 기본값으로 사용합니다. 요청은 26 MiB와 2분으로 제한되며, 업로드된 오디오는 요청 스냅샷에서 제외됩니다. 로컬 게이트웨이로 실제 전송된 요청만 처리됩니다. 모델 제공자를 설정해도 공식 트랜스크리브 서비스를 계속 사용하는 클라이언트나 클라이언트 자체에서 제한한 마이크로를 여는 것은 허용되지 않습니다.
 
 > ![Codex 계정](docs/images/codex_list.png)
 
@@ -462,6 +463,8 @@ npm run tauri build
 
 ## 감사의 말
 
+- Codex 계정 풀 로테이션, 토큰 갱신 동시성 및 영속성, 첫 출력 이전의 실패 처리, 첫 응답 시간 측정과 시도 추적, 선택적 요청 스냅샷, 모델 추론 기본값, 설정 가져오기 보호는 [Codex-Manager](https://github.com/qxcnm/Codex-Manager)의 설계와 구현을 참고했습니다.
+
 - 일부 계정 가져오기 검증, 게이트웨이 자격 증명 로딩 및 안정성 개선은 [super-ai-tools](https://github.com/lihah111222333-cloud/super-ai-tools)의 로컬 보존 소스 스냅샷을 참고했습니다. 출처 및 라이선스 표기는 [출처 고지](docs/third-party/super-ai-tools.md)를 참고하십시오.
 
 - Codex 프록시 작업 공간의 페이지 계층 구조, 구독 카드, 현재 노드 표시, 그룹/노드 드롭다운, 지연 시간 배지 및 정렬, 네이티브 지연 측정 API 호출, 빠른 전환 인터랙션과 구독 출처 명명 규칙은 [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev)의 인터페이스와 구현 아이디어를 참고했습니다. 이는 설계 및 구현 참고이며 런타임 의존성이나 공식 제휴가 아닙니다.
@@ -473,16 +476,17 @@ npm run tauri build
 - [Linear](https://linear.app/now/behind-the-latest-design-refresh) 및 [Vercel Geist](https://vercel.com/geist/empty-state): Codex 도구 페이지의 시각적 위계, 일관된 컨트롤 크기, 빈 상태 가이드 아이디어를 참고했으며 런타임 통합은 없습니다.
 - Codex 계정별 프록시의 초기 구현과 기존 설정 호환성은 [sing-box](https://github.com/SagerNet/sing-box)의 공식 노드 설정 및 프로세스 문서를 참고했습니다. 이후 자동 속도 테스트와 기존 연결 처리 설계도 소스를 참고했으며, 현재 런타임 엔진은 여전히 Mihomo입니다. 이는 공식 제휴를 의미하지 않습니다.
 - Antigravity 계정 전환 로직 참고: [Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)
-- Codex API 서비스는 CLIProxyAPI를 통합하며, Codex Live WebRTC/sideband, Responses WebSocket 상태 안전성, canonical token accounting v2, Multi-Agent V2 호환, Grok 계정 및 OAuth, Grok `apply_patch` 프로토콜 호환 방향도 이 오픈소스 구현을 참고했습니다: [router-for-me/CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) (MIT)
+- Codex API 서비스는 CLIProxyAPI를 통합하며, Codex Live WebRTC/sideband, Responses WebSocket 상태 안전성, canonical token accounting v2, Multi-Agent V2 호환, Grok 계정 및 OAuth, Grok `apply_patch` 프로토콜 호환, 계정 풀 오류 분류 및 복구 경계도 이 오픈소스 구현을 참고했습니다: [router-for-me/CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) (MIT)
 - Grok 아이콘 형태 참고: [LobeHub/lobe-icons](https://github.com/lobehub/lobe-icons) (MIT)
 - Grok CLI 작업 사용량 조회 및 호환 파싱 방향 참고: [junhoyeo/tokscale](https://github.com/junhoyeo/tokscale) (MIT)
 - Grok CLI 서드파티 BYOK 및 커스텀 모델 설정 형식은 업스트림 구현과 문서를 따릅니다: [xai-org/grok-build](https://github.com/xai-org/grok-build)
 - Codex API 서비스 프로토콜 호환 방향 참고: [codex-proxy](https://github.com/icebear0828/codex-proxy)
-- Codex Agent Identity 가져오기, 동적 서명, 작업 만료 복구, 계정 백업 형식 호환, 공식 계정 창 사용량(req / 토큰 / A$) 표시 기준, 프록시 취소 및 응답 실패 경계 처리는 [sub2api](https://github.com/Wei-Shaw/sub2api)를 참고했습니다. API 서비스의 클라이언트 호환성, 지문, 용량 오류와 요청 단위 재시도 처리는 CLIProxyAPI를 따르며, Sub2API 계열의 "공식 클라이언트만 허용" 또는 "서드파티 클라이언트 허용" 같은 별도 정책은 유지하지 않습니다. API Key 인증과 계정 범위 제어는 그대로이며, Agent Identity 호환은 당분간 로컬 확장으로 유지합니다.
-- Codex Agent Identity 런타임 등록 프로토콜, Ed25519 키 형식, Responses 클라이언트 freeform 도구 호출(`custom_tool_call`) 이벤트 의미론, 펠리컨 테스트의 응답 수명 주기와 생성 산출물 처리 방향은 공식 구현을 참고했습니다: [openai/codex](https://github.com/openai/codex) (Apache-2.0). 펠리컨 테스트는 공식 클라이언트의 전체 코딩 에이전트 흐름이 아닌 직접 대화 요청을 사용합니다.
+- Codex Agent Identity 가져오기, 동적 서명, 작업 만료 복구, 계정 백업 형식 호환, 공식 계정 창 사용량(req / 토큰 / A$) 표시 기준, 프록시 취소 및 응답 실패 경계 처리, 계정 풀 진단 및 수동 복구 설계는 [sub2api](https://github.com/Wei-Shaw/sub2api)를 참고했습니다. API 서비스의 클라이언트 호환성, 지문, 용량 오류와 요청 단위 재시도 처리는 CLIProxyAPI를 따르며, Sub2API 계열의 "공식 클라이언트만 허용" 또는 "서드파티 클라이언트 허용" 같은 별도 정책은 유지하지 않습니다. API Key 인증과 계정 범위 제어는 그대로이며, Agent Identity 호환은 당분간 로컬 확장으로 유지합니다.
+- Codex 로컬 인증 저장 형식, 로그인 자격 증명 복구, Agent Identity 런타임 등록, Ed25519 키 형식, Responses 클라이언트 freeform 도구 호출(`custom_tool_call`) 이벤트 의미론, Responses Lite 요청 마커 및 병렬 도구 제약, 펠리컨 테스트의 응답 수명 주기와 생성 산출물 처리 방향은 공식 구현을 참고했습니다: [openai/codex](https://github.com/openai/codex) (Apache-2.0). 펠리컨 테스트는 공식 클라이언트의 전체 코딩 에이전트 흐름이 아닌 직접 대화 요청을 사용합니다.
 - Codex, Claude CLI, Claude Desktop Gateway의 서드파티 제공자 프리셋, 모델 매핑, 세션 JSONL에서 실제 사용량 집계하는 방향 참고: [CC Switch](https://github.com/farion1231/cc-switch)
 - Codex 모델 카탈로그, 프런트엔드 모델 표시, loopback CDP 진단, 공식 live auth 보존 전략, 과거 세션 Provider·SQLite 로컬 카탈로그·워크스페이스 상태 복구 방향 참고: [CodexPlusPlus](https://github.com/BigPizzaV3/CodexPlusPlus)
 - Codex 사용량 통계 대시보드, 추이 그래프 및 Studio 스타일 인터페이스 설계 방향 참고: [Antigravity Studio](https://github.com/yuzhiqiang1993/antigravity-studio)
+- 선택적 외부 브리지 호환성 검증은 [Codex Web GPT](https://github.com/miuuyy/codex-chatgpt-web)의 로컬 통합 기록과 설정 관례를 따릅니다. 이미 사용자가 설치한 유효한 브리지만 보존하며, 런타임 의존성이나 공식 제휴를 뜻하지 않습니다.
 - Codex 관리 카탈로그에서 실험 모델을 표시하는 아이디어 참고: [gptsolwm](https://github.com/yynxxxxx/gptsolwm)
 - Claude 선택 로그인 헬퍼 런타임은 다음을 기반으로 합니다: [Electron](https://github.com/electron/electron)
 
