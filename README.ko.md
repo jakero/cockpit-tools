@@ -51,7 +51,7 @@
       </a>
     </td>
     <td>
-      <a href="https://roxybrowser.cn?code=0326VTDA"><strong>RoxyBrowser</strong></a>는 다중 계정 운영과 AI 자동화 시나리오를 위한 지문 브라우저로, 독립적인 브라우저 지문 환경, Cookie/저장소 격리, Roxy 네이티브 주거용 IP, 팀 협업, API/MCP 자동화를 지원합니다. AI 계정 매트릭스 관리, 계정 연관 위험 감소, 장기 사용 안정성 향상에 적합합니다. Cockpit <a href="https://roxybrowser.cn?code=0326VTDA"><strong>초대 링크</strong></a>로 가입 또는 구매하면 팬 할인 10%를 받을 수 있습니다.
+      <a href="https://roxybrowser.cn?code=0326VTDA"><strong>RoxyBrowser</strong></a>는 다중 계정 운영과 AI 자동화 시나리오를 위한 지문 브라우저로, 독립적인 브라우저 지문 환경, Cookie / 저장소 격리, Roxy 네이티브 주거용 IP, 팀 협업, API / MCP 자동화를 지원합니다. AI 계정 매트릭스 관리, 계정 연관 위험 감소, 장기 사용 안정성 향상에 적합합니다. Cockpit <a href="https://roxybrowser.cn?code=0326VTDA"><strong>초대 링크</strong></a>로 가입 또는 구매하면 팬 할인 10%를 받을 수 있습니다.
     </td>
   </tr>
 </table>
@@ -69,7 +69,7 @@
 - **빠른 작업**: 원클릭 새로고침, 원클릭 깨우기
 - **시각적 진행률**: 쿼터 소비량을 직관적인 진행 막대로 표시
 
-> ![대시보드 개요](docs/images/dashboard_overview.png)
+> ![Dashboard Overview](docs/images/dashboard_overview.png)
 
 ### 2. Antigravity IDE 계정 관리
 
@@ -77,10 +77,10 @@
 - **다양한 가져오기 방식**: OAuth 인증, Refresh Token, 플러그인 동기화
 - **깨우기 작업**: AI 모델을 예약된 시간에 깨워 쿼터 초기화 주기를 앞당김
 
-> ![Antigravity IDE 계정](docs/images/antigravity_list.png)
+> ![Antigravity IDE Accounts](docs/images/antigravity_list.png)
 >
 > *(깨우기 작업)*
-> ![깨우기 작업](docs/images/wakeup_detail.png)
+> ![Wakeup Tasks](docs/images/wakeup_detail.png)
 
 #### 2.1 Antigravity IDE 다중 인스턴스
 
@@ -90,17 +90,17 @@ Antigravity IDE 인스턴스를 여러 개 실행하고 서로 다른 계정을 
 - **프로젝트 병렬 처리**: 여러 작업/프로젝트를 동시에 수행
 - **매개변수 격리**: 인스턴스 디렉터리와 시작 매개변수를 사용자 지정 가능
 
-> ![Antigravity IDE 인스턴스](docs/images/antigravity_instances.png)
+> ![Antigravity IDE Instances](docs/images/antigravity_instances.png)
 
 ### 3. Codex 계정 관리
 
 - **전문화된 지원**: Codex에 최적화된 계정 관리 경험
 - **쿼터 표시**: Hourly 및 Weekly 쿼터 상태를 명확하게 표시
-- **플랜 식별**: 계정 플랜 유형(Basic, Plus, Team 등)을 자동으로 인식
-- **API 서비스**: 로컬 Codex API 서비스는 내장된 CLIProxyAPI 사이드카가 구동합니다. Cockpit Tools는 계정 동기화, 설정 투영, 상태 및 사용량 통계를 담당하며, Base URL과 API Key, 사용자 조작 방식은 그대로 유지됩니다.
-- **음성 프록싱**: 네이티브 Codex 백엔드 실시간 라우트와 `/transcribe`를 지원하며, `/v1/audio/transcriptions`, `/v1/audio/translations`, `/v1/audio/speech` 및 `/v1` 없는 별칭도 지원합니다. OAuth 트랜스크리브는 ChatGPT 백엔드를 사용합니다. 호환 엔드포인트는 `file`, `language`, JSON/텍스트 출력을 지원하며, `model`은 호환성용 필드이고 실제 모델은 백엔드가 선택합니다. 타임스탬프 자막, 스트리밍 트랜스크리브 등 그 밖의 오디오 작업에는 해당 API를 지원하는 API Key 제공자가 필요합니다. 네이티브 `/transcribe`는 멀티파트 필드를 그대로 유지하며, API Key 전달 방식은 요청에 모델이 없으면 `gpt-4o-mini-transcribe`를 기본값으로 사용합니다. 요청은 26 MiB와 2분으로 제한되며, 업로드된 오디오는 요청 스냅샷에서 제외됩니다. 로컬 게이트웨이로 실제 전송된 요청만 처리됩니다. 모델 제공자를 설정해도 공식 트랜스크리브 서비스를 계속 사용하는 클라이언트나 클라이언트 자체에서 제한한 마이크로를 여는 것은 허용되지 않습니다.
+- **플랜 식별**: 계정 Plan 유형(Basic, Plus, Team 등)을 자동으로 인식
+- **API 서비스**: 로컬 Codex API 서비스는 내장된 CLIProxyAPI sidecar가 구동합니다. Cockpit Tools는 계정 동기화, 설정 투영, 상태 및 사용량 통계를 담당하며, Base URL과 API Key, 사용자 조작 방식은 그대로 유지됩니다.
+- **음성 프록싱**: 네이티브 Codex backend 실시간 라우트와 `/transcribe`를 지원하며, `/v1/audio/transcriptions`, `/v1/audio/translations`, `/v1/audio/speech` 및 `/v1` 없는 별칭도 지원합니다. OAuth 트랜스크리브는 ChatGPT backend를 사용합니다. 호환 엔드포인트는 `file`, `language`, JSON/텍스트 출력을 지원하며, `model`은 호환성용 필드이고 실제 모델은 backend가 선택합니다. 타임스탬프 자막, 스트리밍 트랜스크리브 등 그 밖의 오디오 작업에는 해당 API를 지원하는 API Key 제공자가 필요합니다. 네이티브 `/transcribe`는 multipart 필드를 그대로 유지하며, API Key 전달 방식은 요청에 모델이 없으면 `gpt-4o-mini-transcribe`를 기본값으로 사용합니다. 요청은 26 MiB와 2분으로 제한되며, 업로드된 오디오는 요청 스냅샷에서 제외됩니다. 로컬 게이트웨이로 실제 전송된 요청만 처리됩니다. 모델 제공자를 설정해도 공식 트랜스크리브 서비스를 계속 사용하는 클라이언트나 클라이언트 자체에서 제한한 마이크로를 여는 것은 허용되지 않습니다.
 
-> ![Codex 계정](docs/images/codex_list.png)
+> ![Codex Accounts](docs/images/codex_list.png)
 
 #### 3.1 Codex 다중 인스턴스
 
@@ -110,12 +110,12 @@ Codex 역시 다중 계정·다중 인스턴스 병렬 실행을 지원합니다
 - **프로젝트 병렬 처리**: 여러 작업/프로젝트를 동시에 수행
 - **매개변수 격리**: 인스턴스 디렉터리와 시작 매개변수를 사용자 지정 가능
 
-> ![Codex 인스턴스](docs/images/codex_instances.png)
+> ![Codex Instances](docs/images/codex_instances.png)
 
 ### 4. GitHub Copilot 계정 관리
 
 - **계정 가져오기**: OAuth 인증, Token/JSON 가져오기
-- **쿼터 보기**: Inline Suggestions / Chat 메시지 사용량과 초기화 시점 표시
+- **쿼터 보기**: Inline Suggestions / Chat messages 사용량과 초기화 시점 표시
 - **플랜 식별**: Free / Individual / Pro / Business / Enterprise 등 플랜 유형을 자동 인식
 - **일괄 작업**: 태그와 일괄 작업 지원
 
@@ -130,7 +130,7 @@ VS Code 기반 Copilot 인스턴스를 격리된 프로필과 수명 주기 제�
 ### 5. Windsurf 계정 관리
 
 - **계정 가져오기**: OAuth 인증, Token/JSON 가져오기, 로컬 가져오기
-- **쿼터 보기**: 플랜, User Prompt 크레딧, Add-on prompt 크레딧 및 주기 정보 표시
+- **쿼터 보기**: Plan, User Prompt credits, Add-on prompt credits 및 주기 정보 표시
 - **일괄 작업**: 태그와 일괄 작업 지원
 - **전환 주입**: 계정 전환 후 Windsurf에 주입하고 실행하는 기능 지원
 
@@ -145,7 +145,7 @@ Windsurf 인스턴스를 격리된 프로필과 수명 주기 제어와 함께 �
 ### 6. Kiro 계정 관리
 
 - **계정 가져오기**: OAuth 인증, Token/JSON 가져오기, 로컬 가져오기
-- **쿼터 보기**: 플랜, User Prompt 크레딧, Add-on prompt 크레딧 및 주기 정보 표시
+- **쿼터 보기**: Plan, User Prompt credits, Add-on prompt credits 및 주기 정보 표시
 - **일괄 작업**: 태그와 일괄 작업 지원
 - **전환 주입**: 계정 전환 후 Kiro에 주입하고 실행하는 기능 지원
 
@@ -175,7 +175,7 @@ Cursor 인스턴스를 격리된 프로필과 수명 주기 제어와 함께 관
 
 ### 8. Grok CLI 계정 관리
 
-- **OAuth 인증**: xAI 공식 OIDC 디바이스 플로우를 지원하며, 브라우저에서 인증이 완료되면 계정을 저장합니다
+- **OAuth 인증**: xAI 공식 OIDC device flow를 지원하며, 브라우저에서 인증이 완료되면 계정을 저장합니다
 - **API 키 및 서드파티 엔드포인트**: xAI 공식 API 키와 함께 OpenAI 호환 서드파티 `Base URL` 및 모델 ID를 지원합니다. 설정은 계정별 `config.toml`에 기록되며, 키는 해당 CLI 프로세스를 시작할 때만 환경 변수로 주입됩니다
 - **가져오기 및 마스킹 내보내기**: 기본 `~/.grok/auth.json` 또는 지정한 JSON에서 공식 자격 증명을 가져옵니다. 계정 페이지 내보내기와 범용 계정 백업에는 access token/refresh token이 포함되지 않아 로그인 복원에 사용할 수 없으며, 마이그레이션 시 공식 `auth.json`을 별도로 가져와야 합니다
 - **실제 계정 전환**: 선택한 계정을 Grok CLI 공식 registry 형식으로 기본 `~/.grok/auth.json`에 기록하며, 파일 내 다른 registry scope은 그대로 유지합니다
@@ -184,7 +184,7 @@ Cursor 인스턴스를 격리된 프로필과 수명 주기 제어와 함께 관
 
 #### 8.1 Grok CLI 다중 인스턴스
 
-Grok CLI 기본 인스턴스는 보통 공식 `~/.grok` 디렉터리를 그대로 사용하며 `GROK_HOME`을 설정하지 않고 실행됩니다. 관리되는 인스턴스는 별도의 디렉터리를 사용합니다. 서드파티 엔드포인트를 포함한 API 키 계정은 공식 OAuth 세션이 자격 증명 우선순위를 차지하지 않도록 항상 계정 전용 `GROK_HOME`으로 실행됩니다.
+Grok CLI 기본 인스턴스는 보통 공식 `~/.grok` 디렉터리를 그대로 사용하며 `GROK_HOME`을 설정하지 않고 실행됩니다. 관리되는 인스턴스는 별도의 디렉터리를 사용합니다. 서드파티 엔드포인트를 포함한 API 키 계정은 공식 OAuth session이 자격 증명 우선순위를 차지하지 않도록 항상 계정 전용 `GROK_HOME`으로 실행됩니다.
 
 - **계정 바인딩**: 기본 인스턴스는 현재 계정을 따라갈 수 있고, 관리되는 각 인스턴스는 서로 다른 계정을 바인딩할 수 있습니다
 - **실행 격리**: 관리되는 인스턴스는 `auth.json`, `config.toml`, 작업 디렉터리, 시작 매개변수가 서로 분리됩니다
@@ -280,7 +280,7 @@ ZCode 인스턴스를 Electron 사용자 데이터, 세션 데이터, ZCode 데�
 - **개인화 설정**: 테마 전환, 언어 설정, 자동 새로고침 간격
 - **플랫폼 관리**: Grok CLI / CodeBuddy CN / Qoder / Trae 스위트 / Zed / ZCode의 플랫폼 설정과 쿼터 경보를 중앙에서 관리
 
-> ![설정](docs/images/settings_page.png)
+> ![Settings](docs/images/settings_page.png)
 
 ---
 
@@ -291,7 +291,7 @@ ZCode 인스턴스를 Electron 사용자 데이터, 세션 데이터, ZCode 데�
 - **로컬 데스크톱 도구입니다**: 이 프로젝트 전용 클라우드 계정을 별도로 만들 필요가 없으며, 프로젝트가 운영하는 클라우드에 계정 목록을 저장하지도 않습니다.
 - **데이터는 주로 사용자의 컴퓨터에 저장됩니다**:
   - `~/.cockpit_tools`: 플랫폼별 계정, 공용 설정, 로그, 백업, 인스턴스 설정. 개발 환경은 `~/.cockpit_tools_dev`를 사용하며, `COCKPIT_TOOLS_DATA_DIR`로 사용자 지정 디렉터리를 지정할 수 있습니다
-  - 기존 설치는 백그라운드에서 Unix 심볼릭 링크 또는 Windows 디렉터리 정션(junction)을 통해 `~/.antigravity_cockpit` / `~/.antigravity_cockpit_dev`에 새 이름의 호환 진입점을 자동 생성합니다. 수동 마이그레이션은 필요 없습니다. 기존 실제 디렉터리와 기존 인스턴스 경로는 그대로 유지되고, 두 진입점은 같은 데이터를 읽고 씁니다. 현재 세션은 기존 경로를 유지하며, 이후 실행부터 새 진입점을 사용합니다. 링크를 만들 수 없으면 기존 디렉터리를 계속 사용합니다. 새 이름과 기존 이름이 서로 다른 디렉터리를 가리키는 경우에도 기존 디렉터리를 유지하며, 자동으로 병합하거나 덮어쓰지 않습니다
+  - 기존 설치는 백그라운드에서 Unix 심볼릭 링크 또는 Windows 디렉터리 정션을 통해 `~/.antigravity_cockpit` / `~/.antigravity_cockpit_dev`에 새 이름의 호환 진입점을 자동 생성합니다. 수동 마이그레이션은 필요 없습니다. 기존 실제 디렉터리와 기존 인스턴스 경로는 그대로 유지되고, 두 진입점은 같은 데이터를 읽고 씁니다. 현재 세션은 기존 경로를 유지하며, 이후 실행부터 새 진입점을 사용합니다. 링크를 만들 수 없으면 기존 디렉터리를 계속 사용합니다. 새 이름과 기존 이름이 서로 다른 디렉터리를 가리키는 경우에도 기존 디렉터리를 유지하며, 자동으로 병합하거나 덮어쓰지 않습니다
   - 관리되는 인스턴스는 기본적으로 공용 디렉터리의 `instances/<플랫폼>`에 위치합니다. Windows에서는 일부 플랫폼이 `%APPDATA%\.cockpit_tools\instances\<플랫폼>`을 사용하며, 기존 디렉터리에도 동일한 자동 호환이 적용됩니다. 사용자 지정 디렉터리는 그대로 유지됩니다
   - `~/.codex`: Codex 공식 현재 로그인 `auth.json`
   - `~/.grok`: Grok CLI 공식 기본 인스턴스와 현재 로그인 `auth.json`
@@ -300,11 +300,11 @@ ZCode 인스턴스를 Electron 사용자 데이터, 세션 데이터, ZCode 데�
 - **Grok CLI 자격 증명은 암호화되지 않습니다**: access token과 refresh token이 평문 JSON으로 로컬에 저장되며, 주로 운영체제 계정 격리와 로컬 파일 권한으로 보호됩니다. Unix 계열에서는 자격 증명 디렉터리를 `0700`, 자격 증명 파일을 `0600`으로 설정합니다. 마스킹된 내보내기에는 토큰이 포함되지 않아 로그인 백업으로 사용할 수 없습니다
 - **WebSocket는 기본적으로 로컬 전용입니다**: `127.0.0.1`에 바인딩되며 기본 포트는 `19528`입니다. 설정에서 끄거나 포트를 변경할 수 있습니다
 - **네트워크에 연결되는 시점**: OAuth 로그인, 토큰 갱신, 쿼터 조회, 업데이트 확인 등 공식 API 요청이 필요할 때입니다
-- **macOS 개인정보 권한 알림**: Cockpit Tools에서 Codex/에이전트를 시작한 뒤, 에이전트가 실행한 셸 명령이 바탕화면·문서·다운로드·사진 같은 보호된 폴더에 접근하면 macOS가 "Cockpit Tools가 …에 접근하려고 합니다"와 같은 형태로 권한 요청을 표시할 수 있습니다. 해당 명령이 Cockpit Tools가 시작한 하위 프로세스이기 때문에 macOS가 권한 요청의 주체를 호스트 애플리케이션으로 귀속시키기 때문입니다. 이는 Cockpit Tools 본체가 해당 폴더를 직접 스캔한다는 뜻은 아닙니다. 현재 에이전트 작업과 실행될 명령을 신뢰하는 경우에만 허용하시고, 판단이 서면 거절하거나 프로젝트가 있는 일반 작업 디렉터리에서 먼저 실행하십시오
+- **macOS 개인정보 권한 알림**: Cockpit Tools에서 Codex/agent를 시작한 뒤, agent가 실행한 shell 명령이 바탕화면·문서·다운로드·사진 같은 보호된 폴더에 접근하면 macOS가 "Cockpit Tools가 …에 접근하려고 합니다"와 같은 형태로 권한 요청을 표시할 수 있습니다. 해당 명령이 Cockpit Tools가 시작한 하위 프로세스이기 때문에 macOS가 권한 요청의 주체를 호스트 애플리케이션으로 귀속시키기 때문입니다. 이는 Cockpit Tools 본체가 해당 폴더를 직접 스캔한다는 뜻은 아닙니다. 현재 agent 작업과 실행될 명령을 신뢰하는 경우에만 허용하시고, 판단이 서면 거절하거나 프로젝트가 있는 일반 작업 디렉터리에서 먼저 실행하십시오
 - **실용적인 안전 조언**:
   1. 플러그인 연동이 필요 없다면 WebSocket를 끄십시오.
   2. 사용자 디렉터리 전체를 그대로 공유하지 마십시오. 백업·공유 전에 토큰 파일은 마스킹하십시오.
-  3. 공용·공공 PC에서는 사용을 마친 뒤 계정을 삭제하고 앱을 종료하십시오.
+  3. 공용·공공 컴퓨터에서는 사용을 마친 뒤 계정을 삭제하고 앱을 종료하십시오.
 
 ## 설정 가이드 (처음 접하는 분용)
 
@@ -314,7 +314,7 @@ ZCode 인스턴스를 Electron 사용자 데이터, 세션 데이터, ZCode 데�
 
 | 설정 항목 | 하는 일 (쉬운 설명) | 추천값 | 언제 바꾸나 |
 | --- | --- | --- | --- |
-| 표시 언어 | UI 언어 변경 | 익숙한 언어 | 현재 언어가 읽기 어려울 때만 |
+| 표시 언어 | 인터페이스 언어 변경 | 익숙한 언어 | 현재 언어가 읽기 어려울 때만 |
 | 테마 | 밝게/어둡게 표시 | 시스템 | 밤에 오래 사용할 때 어두운 테마로 |
 | 창 닫기 동작 | 닫기 버튼을 눌렀을 때의 동작 | 매번 묻기 | 백그라운드 상주하려면 "트레이로 최소화" 선택 |
 | Antigravity IDE 쿼터 자동 새로고침 | Antigravity IDE 쿼터 주기적 갱신 | 5~10분 | 실시간에 가깝게 갱신하려면 2분 |
@@ -335,7 +335,7 @@ ZCode 인스턴스를 Electron 사용자 데이터, 세션 데이터, ZCode 데�
 
 보충 설명:
 - 새로고침 간격이 짧을수록 요청이 자주 발생합니다. 안정성을 중시한다면 간격을 조금 길게 잡으십시오.
-- "쿼터 초기화 깨우기" 관련 작업을 켜면 일부 새로고침 간격에 최솟값 제한이 적용될 수 있습니다(UI에 안내가 표시됩니다).
+- "쿼터 초기화 깨우기" 관련 작업을 켜면 일부 새로고침 간격에 최솟값 제한이 적용될 수 있습니다(화면에 안내가 표시됩니다).
 
 ### 네트워크 설정
 
@@ -353,7 +353,7 @@ ZCode 인스턴스를 Electron 사용자 데이터, 세션 데이터, ZCode 데�
 
 ---
 
-## 설치 가이드
+## 설치 가이드 (Installation)
 
 ### 옵션 A: 직접 다운로드 (권장)
 
@@ -393,10 +393,10 @@ brew install --cask cockpit-tools
 brew install --cask --force cockpit-tools
 ```
 
-### 🛠️ 문제 해결
+### 🛠️ 문제 해결 (Troubleshooting)
 
 #### macOS에서 "앱이 손상되어 열 수 없습니다"라고 표시되나요?
-macOS의 보안 메커니즘 때문에 App Store에서 내려받지 않은 앱은 이 경고를 표시할 수 있습니다. 현재 오픈소스 공개 방식은 아직 Apple Developer ID 서명과 공증 notarization을 사용하지 않아, 일부 macOS 버전에서는 더 엄격한 Gatekeeper 안내가 표시됩니다. 아래 방법으로 빠르게 해결할 수 있습니다:
+macOS의 보안 메커니즘 때문에 App Store에서 내려받지 않은 앱은 이 경고를 표시할 수 있습니다. 현재 오픈소스 공개 방식은 아직 Apple Developer ID 서명과 공증을 사용하지 않아, 일부 macOS 버전에서는 더 엄격한 Gatekeeper 안내가 표시됩니다. 아래 방법으로 빠르게 해결할 수 있습니다:
 
 1.  **명령행 수정** (권장):
     터미널을 열고 다음 명령을 실행하십시오:
@@ -468,7 +468,7 @@ Telegram 대화 그룹 참여: [그룹 참여하기](https://t.me/+Y8gMv4SlZUU2M
 - Antigravity 계정 전환 로직 참고: [Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)
 - Codex API 서비스는 CLIProxyAPI를 통합합니다. Codex Live WebRTC/sideband, Responses WebSocket 상태 안전성, canonical token accounting v2, Multi-Agent V2 호환, Grok CLI 계정 및 OAuth, Grok `apply_patch` 프로토콜 호환, 계정 풀 오류 분류 및 상태 복구 경계는 그 오픈소스 구현을 참고했습니다: [router-for-me/CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) (MIT)
 - Codex, Claude CLI, Claude Desktop Gateway의 서드파티 제공자 프리셋과 모델 매핑, 그리고 세션 JSONL에서 실제 사용량을 집계하는 방향 참고: [CC Switch](https://github.com/farion1231/cc-switch)
-- Claude 선택적 로그인 헬퍼 런타임은 다음을 기반으로 합니다: [Electron](https://github.com/electron/electron)
+- Claude 선택적 로그인 helper 런타임은 다음을 기반으로 합니다: [Electron](https://github.com/electron/electron)
 - Codex 계정 프록시는 지원되는 Clash 노드와 그룹을 별도 프로세스인 [Mihomo](https://github.com/MetaCubeX/mihomo)로 처리합니다. 노드 매개변수, 중첩 그룹과 내장 차단 정책의 설정 의미론, 로컬 연결 로그 인터페이스, 헬스 체크와 장애 전환 설계는 공식 소스와 문서를 참고했습니다. 커널은 사용자가 직접 다운로드하거나 가져오며 호스트 설치 패키지에 포함되지 않습니다. 이는 공식 제휴를 의미하지 않습니다.
 
 위 프로젝트들의 작성자들의 오픈소스 기여에 감사드립니다! 이 프로젝트들이 도움이 되셨다면 ⭐ Star를 눌러 응원해 주세요!
