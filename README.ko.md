@@ -36,16 +36,6 @@
   </tr>
   <tr>
     <td width="120" align="center">
-      <a href="https://go.apimart.ai/gh-cockpit-tools">
-        <img src="src/assets/icons/apimart.png" alt="APIMart" width="96" />
-      </a>
-    </td>
-    <td>
-      이 프로젝트를 후원해 주신 <a href="https://go.apimart.ai/gh-cockpit-tools"><strong>APIMart</strong></a>께 감사드립니다. <a href="https://go.apimart.ai/gh-cockpit-tools"><strong>APIMart</strong></a>는 AI 이미지·영상 생성용 저가 API 플랫폼으로, GPT-Image-2가 <strong>이미지당 $0.006</strong>부터, <strong>1달러당 160장 이상</strong>을 생성할 수 있습니다. 하나의 비동기 API로 이미지와 영상 모두 처리할 수 있으며, 작업 제출 후 ID를 받아 콜백이나 폴링으로 결과를 가져옵니다. 시간 초과 없이 <strong>수만 장</strong> 단위의 일괄 처리가 가능하고, 모델을 바꿔도 코드를 수정할 필요가 없습니다. 월정액 없이 사용량 기반 과금이며 <a href="https://go.apimart.ai/gh-cockpit-tools"><strong>이 링크로 가입</strong></a>하면 바로 시작할 수 있습니다.
-    </td>
-  </tr>
-  <tr>
-    <td width="120" align="center">
       <a href="https://roxybrowser.cn?code=0326VTDA">
         <img src="src/assets/icons/roxybrowser.jpg" alt="RoxyBrowser" width="96" />
       </a>
